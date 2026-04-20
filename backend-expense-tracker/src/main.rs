@@ -4,6 +4,7 @@ mod error;
 mod handlers;
 mod models;
 mod routes;
+mod tests;
 
 use sqlx::postgres::PgPoolOptions;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};

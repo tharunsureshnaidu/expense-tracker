@@ -136,6 +136,36 @@ export default function ExpenseList({
           ))
         )}
       </div>
+
+      {/* Per-category breakdown — only shown when there are expenses */}
+      {expenses.length > 0 && <CategoryBreakdown expenses={expenses} />}
+    </div>
+  );
+}
+
+function CategoryBreakdown({ expenses }: { expenses: Expense[] }) {
+  const totals = expenses.reduce<Record<string, number>>((acc, e) => {
+    acc[e.category] = (acc[e.category] ?? 0) + e.amount;
+    return acc;
+  }, {});
+
+  const sorted = Object.entries(totals).sort(([, a], [, b]) => b - a);
+
+  return (
+    <div className="border-t border-gray-200 bg-gray-50 px-6 py-4">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+        By Category
+      </p>
+      <div className="space-y-1">
+        {sorted.map(([cat, amount]) => (
+          <div key={cat} className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">{cat}</span>
+            <span className="text-sm font-medium tabular-nums text-gray-900">
+              {formatCents(amount)}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

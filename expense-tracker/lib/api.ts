@@ -38,7 +38,8 @@ export async function listExpenses(
   if (params.category) qs.set("category", params.category);
   if (params.sort) qs.set("sort", params.sort);
 
-  const url = apiUrl(`/expenses${qs.size ? `?${qs}` : ""}`);
+  const search = qs.toString();
+  const url = apiUrl(`/expenses${search ? `?${search}` : ""}`);
   const res = await fetch(url, { cache: "no-store" });
 
   if (!res.ok) throw new Error("failed to fetch expenses");

@@ -14,9 +14,6 @@ pub enum AppError {
     #[error("validation error: {0}")]
     Validation(String),
 
-    #[error("not found")]
-    NotFound,
-
     /// Duplicate idempotency key — a concurrent request already committed this record.
     #[error("idempotency key already used")]
     UniqueViolation,
@@ -46,7 +43,6 @@ impl IntoResponse for AppError {
                 (StatusCode::INTERNAL_SERVER_ERROR, "internal server error".to_string())
             }
             AppError::Validation(msg) => (StatusCode::BAD_REQUEST, msg),
-            AppError::NotFound => (StatusCode::NOT_FOUND, "not found".to_string()),
             AppError::UniqueViolation => (StatusCode::CONFLICT, "conflict".to_string()),
             AppError::Internal(msg) => {
                 tracing::error!("internal error: {msg}");
