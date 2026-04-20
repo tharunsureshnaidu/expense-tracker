@@ -1,0 +1,25 @@
+# Rust
+backend-expense-tracker/target/
+
+# Node / Next.js
+expense-tracker/node_modules/
+expense-tracker/.next/
+expense-tracker/out/
+expense-tracker/build/
+expense-tracker/.vercel/
+
+# Env files (NEVER commit secrets!)
+.env
+.env.local
+.env.production
+.env.*.local
+**/.env
+**/.env.local
+**/.env.production
+
+# OS / Editor
+.DS_Store
+.vscode/
+.idea/
+*.log
+*.swp
