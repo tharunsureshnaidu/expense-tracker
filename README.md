@@ -2,7 +2,7 @@
 
 A minimal, production-quality expense tracking application.
 
-**Live Demo:** https://expense-tracker-xyz.vercel.app
+**Live Demo:** https://expense-tracker-seven-phi-91.vercel.app/
 **Backend API:** https://expense-tracker-2f21.onrender.com
 
 > **Note:** The backend is hosted on Render's free tier and spins down after 15 minutes of inactivity. The first request may take 30–50 seconds to wake up the service.
