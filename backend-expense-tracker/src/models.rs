@@ -25,6 +25,8 @@ pub struct CreateExpenseRequest {
 pub struct ListExpensesQuery {
     pub category: Option<String>,
     pub sort: Option<SortOrder>,
+    pub date_from: Option<NaiveDate>,
+    pub date_to: Option<NaiveDate>,
 }
 
 #[derive(Debug, Deserialize, Default)]

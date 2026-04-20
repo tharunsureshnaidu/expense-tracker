@@ -37,6 +37,8 @@ export async function listExpenses(
   const qs = new URLSearchParams();
   if (params.category) qs.set("category", params.category);
   if (params.sort) qs.set("sort", params.sort);
+  if (params.date_from) qs.set("date_from", params.date_from);
+  if (params.date_to) qs.set("date_to", params.date_to);
 
   const search = qs.toString();
   const url = apiUrl(`/expenses${search ? `?${search}` : ""}`);

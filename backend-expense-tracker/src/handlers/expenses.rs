@@ -70,6 +70,13 @@ pub async fn list_expenses(
     Query(params): Query<ListExpensesQuery>,
 ) -> Result<Json<ListExpensesResponse>, AppError> {
     let sort = params.sort.unwrap_or(SortOrder::DateDesc);
-    let expenses = db::expenses::list(&pool, params.category.as_deref(), &sort).await?;
+    let expenses = db::expenses::list(
+        &pool,
+        params.category.as_deref(),
+        params.date_from,
+        params.date_to,
+        &sort,
+    )
+    .await?;
     Ok(Json(ListExpensesResponse { expenses }))
 }

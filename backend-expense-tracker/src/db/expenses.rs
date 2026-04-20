@@ -1,3 +1,4 @@
+use chrono::NaiveDate;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -47,35 +48,55 @@ pub async fn create(
 pub async fn list(
     pool: &PgPool,
     category: Option<&str>,
+    date_from: Option<NaiveDate>,
+    date_to: Option<NaiveDate>,
     sort: &SortOrder,
 ) -> Result<Vec<Expense>, AppError> {
-    // order_clause is derived from our own enum — not user input — safe to interpolate.
+    // All clauses come from our own enum/args — not raw user strings — safe to interpolate.
     let order_clause = match sort {
         SortOrder::DateDesc => "date DESC, created_at DESC",
         SortOrder::DateAsc => "date ASC, created_at ASC",
     };
 
-    let expenses = if let Some(cat) = category {
-        let sql = format!(
-            "SELECT id, amount, category, description, date, idempotency_key, created_at
-             FROM expenses
-             WHERE category = $1
-             ORDER BY {order_clause}"
-        );
-        sqlx::query_as::<_, Expense>(&sql)
-            .bind(cat)
-            .fetch_all(pool)
-            .await?
+    // Build WHERE dynamically; track $N index as conditions are added.
+    let mut conditions: Vec<String> = Vec::new();
+    let mut idx: usize = 1;
+
+    if category.is_some() {
+        conditions.push(format!("category = ${idx}"));
+        idx += 1;
+    }
+    if date_from.is_some() {
+        conditions.push(format!("date >= ${idx}"));
+        idx += 1;
+    }
+    if date_to.is_some() {
+        conditions.push(format!("date <= ${idx}"));
+        idx += 1;
+    }
+    let _ = idx;
+
+    let where_clause = if conditions.is_empty() {
+        String::new()
     } else {
-        let sql = format!(
-            "SELECT id, amount, category, description, date, idempotency_key, created_at
-             FROM expenses
-             ORDER BY {order_clause}"
-        );
-        sqlx::query_as::<_, Expense>(&sql)
-            .fetch_all(pool)
-            .await?
+        format!("WHERE {}", conditions.join(" AND "))
     };
 
-    Ok(expenses)
+    let sql = format!(
+        "SELECT id, amount, category, description, date, idempotency_key, created_at
+         FROM expenses {where_clause} ORDER BY {order_clause}"
+    );
+
+    let mut query = sqlx::query_as::<_, Expense>(&sql);
+    if let Some(cat) = category {
+        query = query.bind(cat);
+    }
+    if let Some(from) = date_from {
+        query = query.bind(from);
+    }
+    if let Some(to) = date_to {
+        query = query.bind(to);
+    }
+
+    query.fetch_all(pool).await.map_err(AppError::from)
 }
